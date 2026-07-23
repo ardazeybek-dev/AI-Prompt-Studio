@@ -12,8 +12,8 @@ load_dotenv()
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 if not GROQ_API_KEY:
     raise RuntimeError(
-        "GROQ_API_KEY tanımlı değil. backend/.env dosyası oluşturup "
-        "GROQ_API_KEY=... satırını ekleyin (.env.example dosyasına bakın)."
+        "GROQ_API_KEY is not set. Create a backend/.env file and add "
+        "GROQ_API_KEY=... (see .env.example)."
     )
 
 client = Groq(api_key=GROQ_API_KEY)
@@ -38,11 +38,11 @@ async def generate_prompt(request: PromptRequest):
             messages=[
                 {
                     "role": "system",
-                    "content": "Sen profesyonel bir prompt mühendisisin. Sana verilen basit fikri alıp detaylı, sinematik ve İngilizce bir görsel oluşturma promptuna dönüştür."
+                    "content": "You are a professional prompt engineer. Take the simple idea you are given and turn it into a detailed, cinematic, English image-generation prompt."
                 },
                 {
                     "role": "user",
-                    "content": f"Fikir: {request.text}"
+                    "content": f"Idea: {request.text}"
                 }
             ],
             model="llama-3.1-8b-instant",
@@ -50,7 +50,7 @@ async def generate_prompt(request: PromptRequest):
         return {"prompt": chat_completion.choices[0].message.content}
     except Exception as e:
         print("\n" + "="*40)
-        print("🚨 GROQ API HATASI DETAYI 🚨")
+        print("🚨 GROQ API ERROR DETAILS 🚨")
         print(traceback.format_exc())
         print("="*40 + "\n")
         raise HTTPException(status_code=500, detail=str(e))
