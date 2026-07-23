@@ -1,17 +1,17 @@
 # CLAUDE.md
 
-Bu dosya, bu depoda çalışırken Claude Code'a (claude.ai/code) rehberlik eder.
+This file guides Claude Code (claude.ai/code) when working in this repository.
 
-## Proje
+## Project
 
-AI Prompt Studio — kullanıcının yazdığı basit fikri, Groq (Llama 3.1) üzerinden detaylı bir
-İngilizce görsel oluşturma promptuna dönüştüren full-stack web uygulaması.
+AI Prompt Studio — a full-stack web app that turns a user's simple idea into a detailed English
+image-generation prompt via Groq (Llama 3.1).
 
-- **backend/** — FastAPI (Python). Tek endpoint: `POST /api/generate` (`{ "text": "..." }` alır,
-  `{ "prompt": "..." }` döner).
-- **frontend/** — React + Vite tek sayfa uygulama. `src/App.jsx` içindeki `handleGenerate` backend'e istek atar.
+- **backend/** — FastAPI (Python). Single endpoint: `POST /api/generate` (takes `{ "text": "..." }`,
+  returns `{ "prompt": "..." }`).
+- **frontend/** — React + Vite single-page app. `handleGenerate` in `src/App.jsx` calls the backend.
 
-## Çalıştırma
+## Running
 
 Backend:
 ```bash
@@ -22,14 +22,14 @@ Frontend:
 cd frontend && npm install && npm run dev
 ```
 
-## Önemli kurallar
+## Key rules
 
-- **API anahtarları koda gömülmez.** Groq anahtarı `backend/.env` içindeki `GROQ_API_KEY`'den okunur.
-  Yeni bir sır eklerken `.env.example` dosyasını da güncelle.
-- Frontend, backend adresini `import.meta.env.VITE_API_URL` üzerinden alır; sabit URL yazma.
-- `.env` dosyaları asla commit'lenmez (bkz. `.gitignore`).
+- **No API keys in code.** The Groq key is read from `GROQ_API_KEY` in `backend/.env`.
+  When adding a new secret, also update `.env.example`.
+- The frontend gets the backend address from `import.meta.env.VITE_API_URL`; never hard-code the URL.
+- `.env` files are never committed (see `.gitignore`).
 
 ## Build
 
-- Frontend production build: `cd frontend && npm run build` → çıktı `frontend/dist/` (statik olarak deploy edilebilir).
-- Backend statik deploy edilemez; ayrı bir sunucu ortamı (Render, Railway vb.) gerektirir.
+- Frontend production build: `cd frontend && npm run build` → output in `frontend/dist/` (deployable as static).
+- The backend cannot be deployed as static; it needs a server environment (Render, Railway, etc.).

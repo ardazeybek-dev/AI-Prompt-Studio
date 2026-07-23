@@ -1,60 +1,60 @@
 # AI Prompt Studio 🚀
 
-Basit fikirlerinizi profesyonel, sinematik ve İngilizce görsel oluşturma promptlarına dönüştüren bir web uygulaması.
+A web app that turns your simple ideas into professional, cinematic, English image-generation prompts.
 
-Kullanıcı bir fikir yazar (örn. *"Bergama'nın tarihi hakkında belgesel sahnesi"*), uygulama bu fikri
-büyük bir dil modeline (Groq üzerinden Llama 3.1) göndererek detaylı bir görsel promptuna çevirir.
+You type an idea (e.g. *"a documentary scene about the history of Bergama"*), and the app sends it to a
+large language model (Llama 3.1 via Groq) to expand it into a detailed visual prompt.
 
-## Mimari
+## Architecture
 
-| Katman    | Teknoloji                     | Görevi                                            |
-|-----------|-------------------------------|---------------------------------------------------|
-| Frontend  | React + Vite                  | Kullanıcı arayüzü ve API istekleri                |
-| Backend   | FastAPI (Python)              | Groq API entegrasyonu ve prompt üretimi           |
-| AI        | Groq / `llama-3.1-8b-instant` | Fikri profesyonel prompta dönüştürme              |
+| Layer     | Technology                    | Role                                          |
+|-----------|-------------------------------|-----------------------------------------------|
+| Frontend  | React + Vite                  | User interface and API requests               |
+| Backend   | FastAPI (Python)              | Groq API integration and prompt generation    |
+| AI        | Groq / `llama-3.1-8b-instant` | Turning the idea into a professional prompt   |
 
-## Kurulum
+## Setup
 
 ### 1) Backend (FastAPI)
 
 ```bash
 cd backend
 
-# Sanal ortam
+# Virtual environment
 python -m venv venv
 # Windows
 .\venv\Scripts\activate
 # macOS / Linux
 # source venv/bin/activate
 
-# Bağımlılıklar
+# Dependencies
 pip install -r requirements.txt
 
-# API anahtarı: .env.example dosyasını .env olarak kopyalayın ve anahtarınızı girin
+# API key: copy .env.example to .env and add your key
 copy .env.example .env      # Windows
 # cp .env.example .env      # macOS / Linux
 ```
 
-`.env` içine Groq API anahtarınızı yazın (https://console.groq.com/keys):
+Add your Groq API key (https://console.groq.com/keys) to `.env`:
 
 ```env
 GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxxxxxx
 ```
 
-> 🔐 **Güvenlik:** API anahtarı artık koda gömülü değil, `.env` dosyasından okunur ve `.env` git'e
-> gönderilmez. Anahtarınızı asla public bir repoda paylaşmayın.
+> 🔐 **Security:** The API key is no longer hard-coded — it is read from `.env`, and `.env` is not
+> committed to git. Never share your key in a public repository.
 
-Sunucuyu başlatın:
+Start the server:
 
 ```bash
 python -m uvicorn main:app --reload
 ```
 
-Backend `http://localhost:8000` adresinde çalışır.
+The backend runs at `http://localhost:8000`.
 
 ### 2) Frontend (React + Vite)
 
-Yeni bir terminalde:
+In a new terminal:
 
 ```bash
 cd frontend
@@ -62,35 +62,35 @@ npm install
 npm run dev
 ```
 
-Tarayıcıda `http://localhost:5173` adresini açın.
+Open `http://localhost:5173` in your browser.
 
-> Backend farklı bir adreste çalışıyorsa `frontend/.env` dosyasında `VITE_API_URL` değişkenini ayarlayın
-> (bkz. `frontend/.env.example`).
+> If the backend runs on a different address, set `VITE_API_URL` in `frontend/.env`
+> (see `frontend/.env.example`).
 
-## Yardımcı Script
+## Helper Script
 
-`backend/modeller.py` — API anahtarınıza açık olan Groq modellerini listeler:
+`backend/modeller.py` — lists the Groq models available to your API key:
 
 ```bash
 python modeller.py
 ```
 
-## Proje Yapısı
+## Project Structure
 
 ```
 AI-Prompt-Studio/
 ├── backend/
-│   ├── main.py            # FastAPI sunucu + Groq entegrasyonu
-│   ├── modeller.py        # Açık modelleri listeleyen yardımcı script
-│   ├── requirements.txt   # Python bağımlılıkları
-│   └── .env.example       # Örnek ortam değişkenleri
+│   ├── main.py            # FastAPI server + Groq integration
+│   ├── modeller.py        # Helper script that lists available models
+│   ├── requirements.txt   # Python dependencies
+│   └── .env.example       # Example environment variables
 ├── frontend/
 │   ├── src/
-│   │   ├── App.jsx        # Arayüz bileşeni ve API isteği
-│   │   ├── main.jsx       # React giriş noktası
-│   │   └── index.css      # Karanlık tema stilleri
-│   ├── index.html         # HTML şablonu
-│   ├── package.json       # Frontend bağımlılıkları
-│   └── .env.example       # Örnek ortam değişkenleri
+│   │   ├── App.jsx        # UI component and API request
+│   │   ├── main.jsx       # React entry point
+│   │   └── index.css      # Dark theme styles
+│   ├── index.html         # HTML template
+│   ├── package.json       # Frontend dependencies
+│   └── .env.example       # Example environment variables
 └── Readme.md
 ```
