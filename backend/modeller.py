@@ -7,9 +7,16 @@ Not: API anahtarı .env dosyasından (GROQ_API_KEY) okunur; koda gömülmez.
 """
 
 import os
+import sys
 
 from dotenv import load_dotenv
 from groq import Groq
+
+# Windows konsolunda Türkçe karakterler için çıktıyı UTF-8'e sabitle.
+try:
+    sys.stdout.reconfigure(encoding="utf-8")
+except (AttributeError, ValueError):
+    pass
 
 load_dotenv()
 
