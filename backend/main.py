@@ -1,12 +1,24 @@
+import os
+import traceback
+
+from dotenv import load_dotenv
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from groq import Groq
-import traceback
 
-client = Groq(api_key="BURAYA_GROQ_API_KEYINIZI_YAZIN")
+load_dotenv()
 
-app = FastAPI()
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+if not GROQ_API_KEY:
+    raise RuntimeError(
+        "GROQ_API_KEY tanımlı değil. backend/.env dosyası oluşturup "
+        "GROQ_API_KEY=... satırını ekleyin (.env.example dosyasına bakın)."
+    )
+
+client = Groq(api_key=GROQ_API_KEY)
+
+app = FastAPI(title="AI Prompt Studio API")
 
 app.add_middleware(
     CORSMiddleware,

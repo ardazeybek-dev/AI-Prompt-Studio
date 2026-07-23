@@ -1,50 +1,96 @@
-ack-End (Arka Yüz) Kurulumu
-Backend klasörüne geçiş yapın, sanal ortamı (virtual environment) aktifleştirin ve gerekli kütüphaneleri yükleyin:
+# AI Prompt Studio 🚀
 
-Bash
+Basit fikirlerinizi profesyonel, sinematik ve İngilizce görsel oluşturma promptlarına dönüştüren bir web uygulaması.
+
+Kullanıcı bir fikir yazar (örn. *"Bergama'nın tarihi hakkında belgesel sahnesi"*), uygulama bu fikri
+büyük bir dil modeline (Groq üzerinden Llama 3.1) göndererek detaylı bir görsel promptuna çevirir.
+
+## Mimari
+
+| Katman    | Teknoloji                     | Görevi                                            |
+|-----------|-------------------------------|---------------------------------------------------|
+| Frontend  | React + Vite                  | Kullanıcı arayüzü ve API istekleri                |
+| Backend   | FastAPI (Python)              | Groq API entegrasyonu ve prompt üretimi           |
+| AI        | Groq / `llama-3.1-8b-instant` | Fikri profesyonel prompta dönüştürme              |
+
+## Kurulum
+
+### 1) Backend (FastAPI)
+
+```bash
 cd backend
-# Sanal ortam oluşturma (Eğer yoksa)
+
+# Sanal ortam
 python -m venv venv
+# Windows
+.\venv\Scripts\activate
+# macOS / Linux
+# source venv/bin/activate
 
-# Sanal ortamı aktifleştirme (Windows)
-.\\venv\\Scripts\\activate
+# Bağımlılıklar
+pip install -r requirements.txt
 
-# Gerekli kütüphanelerin yüklenmesi
-pip install fastapi uvicorn pydantic groq
+# API anahtarı: .env.example dosyasını .env olarak kopyalayın ve anahtarınızı girin
+copy .env.example .env      # Windows
+# cp .env.example .env      # macOS / Linux
+```
 
-API Anahtarı Yapılandırması 🔑
-backend/main.py dosyası içerisinde yer alan api_key alanına kendi Groq API anahtarınızı girmeniz gerekmektedir:
+`.env` içine Groq API anahtarınızı yazın (https://console.groq.com/keys):
 
-Python
-client = Groq(api_key="BURAYA_GROQ_API_KEYINIZI_YAZIN")
-Güvenlik Uyarısı: API anahtarınızı GitHub gibi açık platformlarda herkese açık şekilde paylaşmamanız, projenin güvenliği ve kotanızın tükenmemesi açısından kritik önem taşımaktadır.
+```env
+GROQ_API_KEY=gsk_xxxxxxxxxxxxxxxxxxxx
+```
 
-Arka Yüzü Başlatın:
-Bash
+> 🔐 **Güvenlik:** API anahtarı artık koda gömülü değil, `.env` dosyasından okunur ve `.env` git'e
+> gönderilmez. Anahtarınızı asla public bir repoda paylaşmayın.
+
+Sunucuyu başlatın:
+
+```bash
 python -m uvicorn main:app --reload
-Sunucu varsayılan olarak http://localhost:8000 adresinde çalışmaya başlayacaktır.
-Front-End (Ön Yüz) Kurulumu
-Yeni bir terminal sekmesi açın, frontend klasörüne geçiş yapın ve bağımlılıkları yükleyip projeyi ayağa kaldırın:
+```
 
-Bash
+Backend `http://localhost:8000` adresinde çalışır.
+
+### 2) Frontend (React + Vite)
+
+Yeni bir terminalde:
+
+```bash
 cd frontend
-# Node modüllerini yükleyin
 npm install
-
-# Ön yüzü yerel sunucuda başlatın
 npm run dev
-Tarayıcınızda http://localhost:5173 (veya terminalde belirtilen local port) adresine giderek uygulamayı kullanmaya başlayabilirsiniz.
-Proje Klasör Yapısı
-Plaintext
-ai-prompt-studio/
+```
+
+Tarayıcıda `http://localhost:5173` adresini açın.
+
+> Backend farklı bir adreste çalışıyorsa `frontend/.env` dosyasında `VITE_API_URL` değişkenini ayarlayın
+> (bkz. `frontend/.env.example`).
+
+## Yardımcı Script
+
+`backend/modeller.py` — API anahtarınıza açık olan Groq modellerini listeler:
+
+```bash
+python modeller.py
+```
+
+## Proje Yapısı
+
+```
+AI-Prompt-Studio/
 ├── backend/
-│   ├── main.py          # FastAPI Sunucu Kodları ve Groq Entegrasyonu
-│   └── modeller.py      # API Modellerini Listeleme ve Test Scripti
+│   ├── main.py            # FastAPI sunucu + Groq entegrasyonu
+│   ├── modeller.py        # Açık modelleri listeleyen yardımcı script
+│   ├── requirements.txt   # Python bağımlılıkları
+│   └── .env.example       # Örnek ortam değişkenleri
 ├── frontend/
 │   ├── src/
-│   │   ├── App.jsx      # Ön Yüz Arayüz Bileşeni ve API İstek Mekanizması
-│   │   ├── main.jsx     # React Giriş Noktası
-│   │   └── index.css    # Özelleştirilmiş Karanlık Tema Stilleri
-│   ├── index.html       # Ana HTML Şablonu
-│   └── package.json     # Ön Yüz Bağımlılık Listesi
-└── venv/                # Python Sanal Ortam Klasörü
+│   │   ├── App.jsx        # Arayüz bileşeni ve API isteği
+│   │   ├── main.jsx       # React giriş noktası
+│   │   └── index.css      # Karanlık tema stilleri
+│   ├── index.html         # HTML şablonu
+│   ├── package.json       # Frontend bağımlılıkları
+│   └── .env.example       # Örnek ortam değişkenleri
+└── Readme.md
+```

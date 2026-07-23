@@ -1,9 +1,27 @@
-import google.generativeai as genai
+"""Yardımcı script: Groq API anahtarınıza açık olan modelleri listeler.
 
-genai.configure(api_key="AIzaSyBSF5UbS4-6QXbeDjhgyoVtxx34GqCoYOc")
+Kullanım:
+    python modeller.py
 
-print("\n--- SENİN API ANAHTARINA AÇIK MODELLER ---")
-for m in genai.list_models():
-    if 'generateContent' in m.supported_generation_methods:
-        print(m.name)
-print("------------------------------------------\n")
+Not: API anahtarı .env dosyasından (GROQ_API_KEY) okunur; koda gömülmez.
+"""
+
+import os
+
+from dotenv import load_dotenv
+from groq import Groq
+
+load_dotenv()
+
+api_key = os.getenv("GROQ_API_KEY")
+if not api_key:
+    raise SystemExit(
+        "GROQ_API_KEY tanımlı değil. backend/.env dosyasına GROQ_API_KEY=... ekleyin."
+    )
+
+client = Groq(api_key=api_key)
+
+print("\n--- API ANAHTARINIZA AÇIK MODELLER ---")
+for model in client.models.list().data:
+    print(model.id)
+print("--------------------------------------\n")

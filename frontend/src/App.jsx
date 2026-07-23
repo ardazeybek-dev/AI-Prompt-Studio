@@ -1,5 +1,7 @@
 import { useState } from "react"
 
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:8000"
+
 export default function App() {
   const [text, setText] = useState("")
   const [result, setResult] = useState("")
@@ -9,7 +11,7 @@ export default function App() {
     if (!text) return
     setLoading(true)
     try {
-      const response = await fetch("http://localhost:8000/api/generate", {
+      const response = await fetch(`${API_URL}/api/generate`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ text })
