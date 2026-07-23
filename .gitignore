@@ -1,3 +1,15 @@
+# Python
 venv/
+.venv/
 backend/__pycache__/
+**/__pycache__/
+*.pyc
+
+# Ortam değişkenleri (API anahtarları buraya) — asla commit'lenmez
+.env
+backend/.env
+frontend/.env
+
+# Node / Vite
 frontend/node_modules/
+frontend/dist/
