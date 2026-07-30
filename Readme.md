@@ -1,5 +1,7 @@
 # AI Prompt Studio 🚀
 
+**&#9654; [Try the browser demo](https://ardazeybek-dev.github.io/AI-Prompt-Studio/)** &#8212; no API key needed. It composes prompts locally; the real app calls Llama 3.1 through Groq.
+
 A web app that turns your simple ideas into professional, cinematic, English image-generation prompts.
 
 You type an idea (e.g. *"a documentary scene about the history of Bergama"*), and the app sends it to a
