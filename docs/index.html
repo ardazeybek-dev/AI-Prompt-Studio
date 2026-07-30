@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>AI Prompt Studio — Arda Zeybek</title>
+<meta name="description" content="Turns simple ideas into professional cinematic image prompts. Browser demo of a FastAPI + React + Groq/Llama 3.1 app." />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🚀</text></svg>" />
+<style>
+  :root{
+    --bg:#121212; --card:#1e1e1e; --line:#333; --text:#fff; --muted:#aaa;
+    --accent:#e67e22; --accent-dim:#b3651a; --green:#3fb950; --blue:#58a6ff;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:sans-serif;line-height:1.6;
+    -webkit-font-smoothing:antialiased}
+  a{color:var(--blue)}
+  .wrap{max-width:800px;margin:0 auto;padding:40px 20px 72px}
+
+  .notice{display:flex;gap:12px;align-items:flex-start;background:rgba(230,126,34,.09);
+    border:1px solid rgba(230,126,34,.4);border-radius:8px;padding:14px 16px;margin-bottom:34px;
+    font-size:13.5px;color:#f0d0ae}
+  .notice b{color:var(--accent)}
+
+  h1{color:var(--accent);text-align:center;font-size:clamp(26px,5vw,36px);margin:0 0 8px}
+  .sub{text-align:center;color:var(--muted);margin:0 0 6px}
+  .stack{text-align:center;color:#777;font-family:var(--mono);font-size:12px;margin:0 0 4px}
+  .links{text-align:center;margin-top:16px;display:flex;gap:10px;justify-content:center;flex-wrap:wrap}
+  .link{display:inline-block;text-decoration:none;font-size:13px;font-weight:600;padding:7px 14px;
+    border-radius:8px;border:1px solid var(--line);background:var(--card);color:var(--text)}
+  .link:hover{border-color:#555}
+
+  .studio{margin-top:36px}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+  .chip{font-size:12.5px;padding:6px 12px;border-radius:999px;border:1px solid var(--line);
+    background:var(--card);color:var(--muted);cursor:pointer;font-family:inherit;
+    transition:border-color .15s,color .15s}
+  .chip:hover{border-color:var(--accent);color:var(--accent)}
+  .chips-label{font-size:12px;color:#777;margin-bottom:8px;font-family:var(--mono);
+    text-transform:uppercase;letter-spacing:.1em}
+
+  textarea{width:100%;height:120px;padding:15px;border-radius:8px;border:1px solid var(--line);
+    background:var(--card);color:#fff;font-size:16px;resize:none;font-family:inherit;line-height:1.5}
+  textarea:focus{outline:none;border-color:var(--accent)}
+  .go{width:100%;padding:15px;margin-top:15px;background:var(--accent);color:#fff;border:none;
+    border-radius:8px;font-size:16px;font-weight:bold;cursor:pointer;font-family:inherit;
+    transition:background .15s}
+  .go:hover{background:#f08a33}
+  .go:disabled{background:var(--accent-dim);cursor:not-allowed}
+  .hint{font-size:12px;color:#777;margin-top:10px;text-align:center}
+
+  .result{margin-top:36px;padding:20px;background:var(--card);border-radius:8px;border:1px solid var(--line)}
+  .result-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:14px}
+  .result-head h3{color:var(--accent);margin:0;font-size:16px;flex:1}
+  .copy{font-size:12px;padding:5px 12px;border-radius:6px;border:1px solid var(--line);
+    background:#262626;color:var(--muted);cursor:pointer;font-family:inherit}
+  .copy:hover{border-color:#555;color:#fff}
+  .result pre{white-space:pre-wrap;word-break:break-word;color:#fff;font-family:var(--mono);
+    font-size:14.5px;line-height:1.75;margin:0}
+  .neg{margin-top:18px;padding-top:16px;border-top:1px solid var(--line)}
+  .neg-label{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.1em;
+    color:#e05c5c;margin-bottom:6px}
+  .neg pre{font-size:13px;color:#c9a6a6}
+  .meta{margin-top:16px;padding-top:14px;border-top:1px solid var(--line);
+    display:flex;flex-wrap:wrap;gap:8px}
+  .tag{font-family:var(--mono);font-size:11.5px;padding:3px 9px;border-radius:4px;
+    background:rgba(230,126,34,.14);color:#f0a868}
+
+  h2{font-size:12.5px;font-family:var(--mono);letter-spacing:.12em;text-transform:uppercase;
+    color:var(--muted);margin:56px 0 16px;padding-bottom:10px;border-bottom:1px solid var(--line)}
+
+  details{background:var(--card);border:1px solid var(--line);border-radius:8px;padding:0;overflow:hidden}
+  summary{padding:15px 18px;cursor:pointer;font-size:14.5px;font-weight:600;list-style:none}
+  summary::-webkit-details-marker{display:none}
+  summary::before{content:"▸ ";color:var(--accent)}
+  details[open] summary::before{content:"▾ "}
+  .details-body{padding:0 18px 18px}
+  pre.code{background:#0d0d0d;border:1px solid var(--line);border-radius:8px;padding:15px;
+    overflow-x:auto;font-family:var(--mono);font-size:12.5px;line-height:1.7;margin:12px 0 0;color:#ddd}
+  pre.code .k{color:#ff7b72}pre.code .s{color:#a5d6ff}pre.code .c{color:#777;font-style:italic}
+  pre.code .f{color:#d2a8ff}
+
+  table{width:100%;border-collapse:collapse;font-size:14px;margin-top:4px}
+  th,td{text-align:left;padding:11px 14px;border-bottom:1px solid var(--line);vertical-align:top}
+  th{font-family:var(--mono);font-size:11.5px;text-transform:uppercase;letter-spacing:.08em;
+    color:var(--muted);font-weight:600}
+  td code{font-family:var(--mono);font-size:13px;color:#f0a868}
+
+  footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);
+    font-size:13px;color:var(--muted);text-align:center}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="notice">
+    <span aria-hidden="true">ℹ️</span>
+    <div><b>Browser demo — no AI model is called here.</b> The real app sends your idea to
+    <code>llama-3.1-8b-instant</code> through a FastAPI backend, which needs a Groq API key and cannot run on
+    static hosting. This page reproduces the interface and composes prompts locally with a rule-based
+    cinematography engine, so you can see the shape of the output without a key.
+    <a href="#real">How the real one works ↓</a></div>
+  </div>
+
+  <h1>AI Prompt Studio 🚀</h1>
+  <p class="sub">Turn your simple ideas into professional cinematic prompts</p>
+  <p class="stack">React + Vite · FastAPI · Groq / Llama 3.1</p>
+  <div class="links">
+    <a class="link" href="https://github.com/ardazeybek-dev/AI-Prompt-Studio">View source on GitHub</a>
+    <a class="link" href="https://github.com/ardazeybek-dev/AI-Prompt-Studio#readme">Setup guide</a>
+  </div>
+
+  <div class="studio">
+    <div class="chips-label">Try an example</div>
+    <div class="chips" id="chips"></div>
+
+    <textarea id="idea" placeholder="e.g. A documentary scene about the history of Bergama..."></textarea>
+    <button class="go" id="go" type="button">✨ Generate Professional Prompt</button>
+    <p class="hint">Runs entirely in your browser · the same idea always produces the same prompt</p>
+  </div>
+
+  <div id="out"></div>
+
+  <h2 id="real">How the real app works</h2>
+  <details>
+    <summary>The backend prompt — <code>backend/main.py</code></summary>
+    <div class="details-body">
+      <p style="font-size:14px;color:var(--muted);margin:8px 0 0">FastAPI holds one endpoint. It wraps your
+        idea in a system prompt and hands it to Llama 3.1 on Groq, which does the actual creative expansion
+        the demo above only approximates.</p>
+<pre class="code"><span class="c"># POST /api/generate</span>
+chat_completion = client.chat.completions.<span class="f">create</span>(
+    messages=[
+        {
+            <span class="s">"role"</span>: <span class="s">"system"</span>,
+            <span class="s">"content"</span>: <span class="s">"You are a professional prompt engineer. Take the "</span>
+                       <span class="s">"simple idea you are given and turn it into a detailed, "</span>
+                       <span class="s">"cinematic, English image-generation prompt."</span>
+        },
+        {<span class="s">"role"</span>: <span class="s">"user"</span>, <span class="s">"content"</span>: <span class="s">f"Idea: {request.text}"</span>}
+    ],
+    model=<span class="s">"llama-3.1-8b-instant"</span>,
+)
+<span class="k">return</span> {<span class="s">"prompt"</span>: chat_completion.choices[<span class="s">0</span>].message.content}</pre>
+    </div>
+  </details>
+
+  <details style="margin-top:12px">
+    <summary>Run it locally</summary>
+    <div class="details-body">
+<pre class="code"><span class="c"># 1) Backend — needs a free Groq API key in backend/.env</span>
+cd backend
+python -m venv venv && .\venv\Scripts\activate
+pip install -r requirements.txt
+python -m uvicorn main:app --reload      <span class="c"># :8000</span>
+
+<span class="c"># 2) Frontend</span>
+cd frontend
+npm install
+npm run dev                              <span class="c"># :5173</span></pre>
+      <p style="font-size:13.5px;color:var(--muted);margin:14px 0 0">The key is read from
+        <code>.env</code> and never committed — which is also why this page can't call the model on your
+        behalf.</p>
+    </div>
+  </details>
+
+  <h2>Architecture</h2>
+  <table>
+    <thead><tr><th>Layer</th><th>Technology</th><th>Role</th></tr></thead>
+    <tbody>
+      <tr><td><code>Frontend</code></td><td>React + Vite</td><td>Interface and API requests</td></tr>
+      <tr><td><code>Backend</code></td><td>FastAPI (Python)</td><td>Groq integration, prompt generation</td></tr>
+      <tr><td><code>AI</code></td><td>Groq / llama-3.1-8b-instant</td><td>Expands the idea into a cinematic prompt</td></tr>
+    </tbody>
+  </table>
+
+  <footer>
+    Built by <a href="https://github.com/ardazeybek-dev">Arda Zeybek</a> ·
+    <a href="https://github.com/ardazeybek-dev/AI-Prompt-Studio">Repository</a> ·
+    Hosted on GitHub Pages
+  </footer>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var EXAMPLES = [
+    "A documentary scene about the history of Bergama",
+    "A lone penguin on an ice shelf at sunrise",
+    "A neon-lit street food stall in the rain at night",
+    "A retro-futuristic car dashboard glowing in the dark",
+    "An old woman reading by candlelight in a stone house"
+  ];
+
+  var SHOTS       = ["establishing shot", "wide shot", "medium shot", "close-up", "portrait"];
+  var COMPOSITION = [
+    "Wide establishing frame with the subject on the left third and three distinct depth layers behind it",
+    "Tight three-quarter framing, shallow depth of field lifting the subject clear of the background",
+    "Low camera angle looking upward, strong leading lines converging on the subject",
+    "Symmetrical centred composition, architectural elements framing the subject",
+    "Over-the-shoulder framing with soft foreground bokeh in the near field",
+    "Top-down flat-lay geometry with generous negative space around the subject"
+  ];
+  var LIGHTING = [
+    "Golden-hour sunlight raking across the scene, long soft shadows and warm rim light",
+    "Overcast diffused daylight, gentle wraparound falloff and no harsh speculars",
+    "Hard midday sun, deep contrast and crisp shadow edges",
+    "Practical neon signage as the key light, cyan and magenta spill bouncing off wet surfaces",
+    "A single warm key light from camera left falling off steeply into shadow",
+    "Volumetric god rays cutting through hanging haze",
+    "Blue-hour ambient light with warm interior windows glowing against it",
+    "Candlelight as the only source, flickering highlights across skin and fabric"
+  ];
+  var CAMERA = [
+    "Shot on an ARRI Alexa Mini LF with a 35 mm master prime at f/2.0",
+    "Shot on a RED Komodo with a 24 mm wide at f/4 for deep focus",
+    "Shot on a Sony FX3 with an 85 mm at f/1.4, creamy background falloff",
+    "Shot on a Canon R5 with a 100 mm macro at f/2.8",
+    "Shot on Kodak Portra 400 through an anamorphic lens, subtle oval bokeh",
+    "Shot on a 200 mm telephoto at f/2.8, background compressed flat"
+  ];
+  var GRADE = [
+    "Teal-and-amber grade, filmic highlight rolloff and gentle halation",
+    "Desaturated earth palette broken by one saturated accent colour",
+    "Warm archival grade, fine grain and softened blacks",
+    "High-contrast monochrome with silver-halide texture",
+    "Cool cyan shadows set against warm skin tones"
+  ];
+  var ATMOSPHERE = [
+    "Fine airborne dust catching the light, believable micro-texture on every surface",
+    "Light atmospheric haze separating the planes of the image",
+    "Damp surfaces holding specular reflections, faint mist drifting through frame",
+    "Cold clear air, visible breath and frost detail along the edges",
+    "Still warm air, the faintest heat shimmer in the distance"
+  ];
+  var QUALIFIERS = "Photorealistic, razor-sharp focus on the subject, natural imperfections, 8K detail, no text, no watermark";
+  var NEGATIVE   = "blurry, low resolution, distorted anatomy, extra limbs, oversaturated HDR look, plastic skin, watermark, signature, garbled text, cluttered frame, harsh on-camera flash";
+
+  // Keyword cues bias specific slots, so the output tracks the idea instead of
+  // being random dressing. Turkish and English spellings both match.
+  var CUES = [
+    { re: /histor|tarih|ancient|antik|ruin|roman|documentar|belgesel|museum|müze|archae|arkeo|bergama|pergam/i,
+      set: { shot: 0, light: 0, grade: 2, cam: 0, atmo: 0 }, tag: "historical / documentary" },
+    { re: /night|gece|neon|cyber|city|şehir|street|sokak|rain|yağmur|wet/i,
+      set: { light: 3, grade: 4, cam: 4, atmo: 2 }, tag: "night / neon" },
+    { re: /portrait|portre|face|yüz|woman|kadın|man|adam|child|çocuk|\bold\s|yaşlı|reading|okuy/i,
+      set: { shot: 4, comp: 1, cam: 2, light: 4 }, tag: "portrait" },
+    { re: /forest|orman|mountain|dağ|sea|deniz|lake|göl|nature|doğa|landscape|manzara|field|ice|buz|shelf/i,
+      set: { shot: 0, comp: 0, cam: 1, light: 5 }, tag: "landscape" },
+    { re: /food|yemek|coffee|kahve|dish|cake|pasta|stall|tezgah/i,
+      set: { shot: 3, comp: 5, cam: 3, light: 1 }, tag: "food / macro" },
+    { re: /car|araba|vehicle|dashboard|motorcycle|motosiklet|speed|hız|race|yarış/i,
+      set: { comp: 2, cam: 4, grade: 0 }, tag: "automotive" },
+    { re: /space|uzay|robot|sci-?fi|futur|fütür|android|spaceship|retro-?futur/i,
+      set: { light: 5, grade: 0, atmo: 1 }, tag: "sci-fi" },
+    { re: /animal|hayvan|bird|kuş|cat|kedi|dog|köpek|wolf|kurt|penguin|penguen|horse/i,
+      set: { cam: 5, comp: 1 }, tag: "wildlife" },
+    { re: /snow|kar\b|winter|kış|ice|buz|frost|sunrise|şafak/i,
+      set: { grade: 4, atmo: 3 }, tag: "cold / dawn" },
+    { re: /fantasy|dragon|ejder|magic|büyü|myth|efsane|candle|mum/i,
+      set: { light: 7, grade: 0 }, tag: "fantasy" }
+  ];
+
+  function hash(str) {
+    var h = 2166136261;
+    for (var i = 0; i < str.length; i++) {
+      h ^= str.charCodeAt(i);
+      h = (h * 16777619) >>> 0;
+    }
+    return h;
+  }
+
+  function subjectClause(idea, shot) {
+    var s = idea.trim().replace(/[.\s]+$/, "");
+    // Lowercase a leading article so "of" reads naturally, but leave anything
+    // else alone — the first word is often a proper noun.
+    if (/^(a|an|the)\s/i.test(s)) s = s.charAt(0).toLowerCase() + s.slice(1);
+    return "A cinematic " + shot + " of " + s;
+  }
+
+  function compose(idea) {
+    var h = hash(idea.toLowerCase());
+    // Unsigned shifts throughout: h can exceed 2^31, and a signed shift would
+    // then go negative, making every % below return a negative index.
+    var pick = { shot: h % 5, comp: (h >>> 3) % 6, light: (h >>> 6) % 8,
+                 cam: (h >>> 9) % 6, grade: (h >>> 12) % 5, atmo: (h >>> 15) % 5 };
+    var tags = [];
+    var claimed = {};
+
+    // First matching cue wins each slot. Two cues often fire on one idea
+    // ("neon" + "food stall"), and letting the later one overwrite produced
+    // contradictions like a night scene lit by overcast daylight.
+    CUES.forEach(function (cue) {
+      if (!cue.re.test(idea)) return;
+      tags.push(cue.tag);
+      Object.keys(cue.set).forEach(function (slot) {
+        if (claimed[slot]) return;
+        pick[slot] = cue.set[slot];
+        claimed[slot] = true;
+      });
+    });
+
+    var prompt = [
+      subjectClause(idea, SHOTS[pick.shot]) + ".",
+      COMPOSITION[pick.comp] + ".",
+      LIGHTING[pick.light] + ".",
+      CAMERA[pick.cam] + ".",
+      GRADE[pick.grade] + ".",
+      ATMOSPHERE[pick.atmo] + ".",
+      QUALIFIERS + "."
+    ].join(" ");
+
+    return {
+      prompt: prompt,
+      negative: NEGATIVE,
+      tags: tags.length ? tags : ["general cinematic"],
+      seed: h % 100000
+    };
+  }
+
+  function esc(s) {
+    return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  }
+
+  var idea  = document.getElementById("idea");
+  var go    = document.getElementById("go");
+  var out   = document.getElementById("out");
+  var chips = document.getElementById("chips");
+
+  EXAMPLES.forEach(function (ex) {
+    var b = document.createElement("button");
+    b.type = "button";
+    b.className = "chip";
+    b.textContent = ex;
+    b.addEventListener("click", function () { idea.value = ex; generate(); });
+    chips.appendChild(b);
+  });
+
+  function generate() {
+    var text = idea.value.trim();
+    if (!text) { idea.focus(); return; }
+
+    go.disabled = true;
+    go.textContent = "Composing…";
+    out.innerHTML = "";
+
+    // A beat of delay so the state change is legible, mirroring the real
+    // request/response cycle. No network call is made.
+    setTimeout(function () {
+      var r = compose(text);
+      out.innerHTML =
+        '<div class="result">' +
+          '<div class="result-head">' +
+            '<h3>Generated Prompt</h3>' +
+            '<button class="copy" type="button" id="copy">Copy</button>' +
+          '</div>' +
+          '<pre id="ptext">' + esc(r.prompt) + '</pre>' +
+          '<div class="neg">' +
+            '<div class="neg-label">Negative prompt</div>' +
+            '<pre>' + esc(r.negative) + '</pre>' +
+          '</div>' +
+          '<div class="meta">' +
+            r.tags.map(function (t) { return '<span class="tag">' + esc(t) + '</span>'; }).join("") +
+            '<span class="tag">16:9</span>' +
+            '<span class="tag">seed ' + r.seed + '</span>' +
+          '</div>' +
+        '</div>';
+
+      document.getElementById("copy").addEventListener("click", function () {
+        var btn = this;
+        var full = r.prompt + "\n\nNegative prompt: " + r.negative;
+        var done = function () { btn.textContent = "Copied ✓"; setTimeout(function () { btn.textContent = "Copy"; }, 1600); };
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(full).then(done, function () { btn.textContent = "Press Ctrl+C"; });
+        } else {
+          var sel = window.getSelection();
+          var range = document.createRange();
+          range.selectNodeContents(document.getElementById("ptext"));
+          sel.removeAllRanges(); sel.addRange(range);
+          btn.textContent = "Press Ctrl+C";
+        }
+      });
+
+      go.disabled = false;
+      go.textContent = "✨ Generate Professional Prompt";
+      out.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    }, 480);
+  }
+
+  go.addEventListener("click", generate);
+  idea.addEventListener("keydown", function (e) {
+    if ((e.metaKey || e.ctrlKey) && e.key === "Enter") generate();
+  });
+})();
+</script>
+</body>
+</html>
