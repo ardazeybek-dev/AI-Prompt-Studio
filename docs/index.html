@@ -241,6 +241,8 @@ npm run dev                              <span class="c"># :5173</span></pre>
   // Keyword cues bias specific slots, so the output tracks the idea instead of
   // being random dressing. Turkish and English spellings both match.
   var CUES = [
+    // The keyword lists are deliberately bilingual: the studio is meant to take an idea
+    // typed in either English or Turkish and still pick the right style.
     { re: /histor|tarih|ancient|antik|ruin|roman|documentar|belgesel|museum|müze|archae|arkeo|bergama|pergam/i,
       set: { shot: 0, light: 0, grade: 2, cam: 0, atmo: 0 }, tag: "historical / documentary" },
     { re: /night|gece|neon|cyber|city|şehir|street|sokak|rain|yağmur|wet/i,

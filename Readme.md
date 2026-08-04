@@ -71,10 +71,10 @@ Open `http://localhost:5173` in your browser.
 
 ## Helper Script
 
-`backend/modeller.py` — lists the Groq models available to your API key:
+`backend/models.py` — lists the Groq models available to your API key:
 
 ```bash
-python modeller.py
+python models.py
 ```
 
 ## Project Structure
@@ -83,7 +83,7 @@ python modeller.py
 AI-Prompt-Studio/
 ├── backend/
 │   ├── main.py            # FastAPI server + Groq integration
-│   ├── modeller.py        # Helper script that lists available models
+│   ├── models.py          # Helper script that lists available models
 │   ├── requirements.txt   # Python dependencies
 │   └── .env.example       # Example environment variables
 ├── frontend/

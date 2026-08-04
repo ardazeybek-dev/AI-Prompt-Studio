@@ -1,7 +1,7 @@
 """Helper script: lists the Groq models available to your API key.
 
 Usage:
-    python modeller.py
+    python models.py
 
 Note: the API key is read from the .env file (GROQ_API_KEY); it is never hard-coded.
 """
